@@ -157,7 +157,7 @@ public class StateMainMenu implements IState {
 		graphics.setFont(display.getGameFont(14f));
 		graphics.setColor(new Color(223, 195, 15));
 		GraphicsManager.drawString(display.getVersion(), 0, display.getHeight() - graphics.getFontMetrics().getHeight() * 2, graphics);
-		GraphicsManager.drawString("November 26 2018", 0, display.getHeight() - graphics.getFontMetrics().getHeight(), graphics);
+		GraphicsManager.drawString("February 17 2019", 0, display.getHeight() - graphics.getFontMetrics().getHeight(), graphics);
 		GraphicsManager.drawString(copyright1, display.getWidth() / 2 - graphics.getFontMetrics().stringWidth(copyright1) / 2, display.getHeight() - graphics.getFontMetrics().getHeight() * 2, graphics);
 		GraphicsManager.drawString(copyright2, display.getWidth() / 2 - graphics.getFontMetrics().stringWidth(copyright2) / 2, display.getHeight() - graphics.getFontMetrics().getHeight(), graphics);
 		
@@ -178,5 +178,9 @@ public class StateMainMenu implements IState {
 	@Override
 	public int getId() {
 		return ID;
+	}
+
+	@Override
+	public void OnStateTransition() {		
 	}
 }

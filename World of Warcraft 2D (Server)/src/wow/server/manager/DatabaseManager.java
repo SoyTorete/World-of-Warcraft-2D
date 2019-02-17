@@ -11,10 +11,10 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import logon.SC_Character;
 import wow.server.GameServer;
 import wow.server.manager.RealmManager.Realm;
 import wow.server.util.Configuration;
-import wow.server.world.Vector2;
 
 /**
  * Handles everything database-related.
@@ -127,6 +127,132 @@ public class DatabaseManager {
 			closeQuietly();
 		}
 		return null;
+	}
+	
+	/**
+	 * Create a character on an account.
+	 * @param name
+	 * @param raceId
+	 * @param userId
+	 * @param realmId
+	 */
+	public static QueryState CreateCharacter(String name, int raceId, int userId, int realmId, int zoneId) {
+		String query = "INSERT INTO user_characters (user_id, realm_id, character_name, x_position, y_position, direction, zone, race) VALUES (?, ?, ?, 0, 0, 0, ?, ?)";
+		PreparedStatement statement = null;
+		
+		if (CharacterExists(name))
+			return QueryState.Exists;
+		
+		createConnection(2);
+		
+		try {
+			statement = characterConnection.prepareStatement(query);
+			statement.setInt(1, userId);
+			statement.setInt(2, realmId);
+			statement.setString(3, name);
+			statement.setInt(4, zoneId);
+			statement.setInt(5, raceId);
+			statement.execute();
+			
+			return QueryState.Success;
+		} catch (SQLException ex) {
+			Logger.getLogger("server").log(Level.SEVERE, "A database error occured while trying to create a character: {0}", ex.getMessage());
+			return QueryState.ConnectionError;
+		} finally {
+			closeQuietly(statement);
+			closeQuietly();
+		}
+	}
+	
+	/**
+	 * Does this character exist?
+	 * @param name
+	 * @return true/false
+	 */
+	private static boolean CharacterExists(String name) {
+		String query = String.format("SELECT * FROM user_characters WHERE character_name='%s'", name);
+		Statement statement = null;
+		ResultSet set = null;
+		
+		createConnection(2);
+		
+		try {
+			statement = characterConnection.createStatement();
+			set = statement.executeQuery(query);
+			
+			if (set.next())
+				return true;
+			else
+				return false;
+		} catch (SQLException ex) {
+			Logger.getLogger("server").log(Level.SEVERE, "Unable to check if character exists: {0}", ex.getMessage());
+		} finally {
+			closeQuietly(set);
+			closeQuietly(statement);
+			closeQuietly();
+		}
+		return true;
+	}
+	
+	/**
+	 * Creates an ArrayList of all of the specified user's characters.
+	 * @param userId
+	 * @param realmId
+	 * @return characters
+	 */
+	public static ArrayList<SC_Character> GetCharactersForUser(int userId, int realmId) {
+		ArrayList<SC_Character> characters = new ArrayList<SC_Character>();
+		String query = String.format("SELECT character_name, zone, race FROM user_characters WHERE user_id='%s' AND realm_id='%s'", userId, realmId);
+		Statement statement = null;
+		ResultSet set = null;
+		
+		createConnection(2);
+		
+		try {
+			statement = characterConnection.createStatement();
+			set = statement.executeQuery(query);
+			
+			while (set.next()) {
+				SC_Character character = new SC_Character();
+				character.Name = set.getString("character_name");
+				character.Zone = set.getInt("zone");
+				character.Race = set.getInt("race");
+				characters.add(character);
+			}
+		} catch (SQLException ex) {
+			Logger.getLogger("server").log(Level.SEVERE, "Unable to gather characters for userId ({0}): {1}", new Object[] {userId, ex.getMessage()});
+		} finally {
+			closeQuietly(set);
+			closeQuietly(statement);
+			closeQuietly();
+		}
+		return characters;
+	}
+	
+	/**
+	 * Deletes the given character from the database.
+	 * @param name
+	 * @param userId
+	 * @param realmId
+	 */
+	public static void DeleteCharacter(String name, int userId, int realmId) {
+		String query = "DELETE FROM user_characters WHERE user_id = ? AND realm_id = ? AND character_name = ?";
+		PreparedStatement statement = null;
+		
+		createConnection(2);
+		
+		try {
+			statement = characterConnection.prepareStatement(query);
+			statement.setInt(1, userId);
+			statement.setInt(2, realmId);
+			statement.setString(3, name);
+			statement.execute();
+		} catch (SQLException ex) {
+			Logger.getLogger("server").log(Level.SEVERE, "Unable to delete character '{0}': {1}", new Object[] {name, ex.getMessage()});
+		} finally {
+			closeQuietly(statement);
+			closeQuietly();
+		}
 	}
 	
 	/**

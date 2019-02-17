@@ -2,6 +2,8 @@ package wow.net.connection;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -23,19 +25,28 @@ public class AuthConnection {
 	
 	public enum Auth {
 		Waiting,
+		Credentials,
 		Connecting,
 		ConnectingFailed,
 		Authenticating,
 		AuthenticatingUnk,
 		AuthenticatingIncorrect,
 		AuthenticatingOk,
-		RealmlistReceived
+		RealmlistReceived,
+		CharacterCreateOk,
+		CharacterCreateExists,
+		CharacterCreateServerError,
+		CharacterList,
 	}
 	
 	private Client client;
 	public static Auth STATUS = Auth.Waiting;
 
 	public AuthConnection(String username, String password) {
+		if (username.isEmpty() || password.isEmpty()) {
+			STATUS = Auth.Credentials;
+			return;
+		}
 		if (client != null)
 			return;
 		client = new Client();
@@ -53,7 +64,7 @@ public class AuthConnection {
 					client.sendTCP(packet);
 				} catch (IOException ex) {
 					STATUS = Auth.ConnectingFailed;
-					System.err.println("Unable to connect: "+ex.getMessage());
+					Logger.getLogger("client").log(Level.WARNING, "{0}", ex.getMessage());
 				}
 			}
 		}.start();

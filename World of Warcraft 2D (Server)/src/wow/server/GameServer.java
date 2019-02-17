@@ -14,6 +14,7 @@ import main.APacket;
 import main.Network;
 import wow.server.GameServerGUI.LogType;
 import wow.server.connection.TemporaryConnection;
+import wow.server.handler.CharacterHandler;
 import wow.server.handler.IHandler;
 import wow.server.handler.LoginHandler;
 import wow.server.handler.RealmHandler;
@@ -92,6 +93,9 @@ public class GameServer {
 		handlers = new LinkedHashMap<String, IHandler>();
 		handlers.put("cs_login", new LoginHandler());
 		handlers.put("cs_realmlist", new RealmHandler());
+		handlers.put("cs_character_create", new CharacterHandler());
+		handlers.put("cs_character_list", new CharacterHandler());
+		handlers.put("cs_character_delete", new CharacterHandler());
 		
 		/** Give the server time to load the zones. **/
 		ZoneManager.Initialize(this);

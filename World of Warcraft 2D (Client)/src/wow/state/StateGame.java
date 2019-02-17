@@ -15,8 +15,6 @@ import wow.net.Player;
 public class StateGame implements IState {
 	
 	public static final int ID = 3;
-	
-	private Player player;
 
 	@Override
 	public void init(DisplayManager display) {
@@ -36,5 +34,9 @@ public class StateGame implements IState {
 	@Override
 	public int getId() {
 		return ID;
+	}
+
+	@Override
+	public void OnStateTransition() {		
 	}
 }

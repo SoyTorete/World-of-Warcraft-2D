@@ -9,14 +9,18 @@ import java.awt.event.ActionListener;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 
+import logon.CS_CharacterList;
 import wow.WoW;
 import wow.gui.GuiButton;
 import wow.manager.DisplayManager;
 import wow.manager.GraphicsManager;
 import wow.manager.InputManager;
 import wow.manager.NetworkManager;
+import wow.manager.NetworkManager.SimplePacketDirection;
 import wow.manager.WoWManager;
 import wow.manager.WoWManager.RaceType;
+import wow.net.RealmCharacter;
+import wow.net.connection.AuthConnection.Auth;
 
 /**
  * The character selection-state.
@@ -67,6 +71,11 @@ public class StateCharacterSelect implements IState {
 		
 		deleteCharacterButton = new GuiButton("Delete Character");
 		deleteCharacterButton.setLocation(createCharacterButton.getX(), enterWorldButton.getY() - deleteCharacterButton.getHeight() * 2);
+		deleteCharacterButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				NetworkManager.SendCharacterDeletionPacket(WoWManager.Characters.get(selectedIndex).Name);
+			}
+		});
 		
 		backButton = new GuiButton("Back");
 		backButton.setLocation(deleteCharacterButton.getX(), enterWorldButton.getY());
@@ -97,20 +106,20 @@ public class StateCharacterSelect implements IState {
 	@Override
 	public void tick(WoW engine, DisplayManager display, double delta) {
 		/** Send the character-list packet if we haven't. **/
-		/*
-		boolean listPacketSent = false;
+		boolean requestSent = false;
 		if (WoWManager.Characters == null) {
-			if (!listPacketSent) {
-				NetworkManager.getAuthConnection().State = STATE.CharacterListRequest;
-				NetworkManager.SendPacket(new PacketCharacterList(), Destination.Auth);
-				listPacketSent = true;
+			if (!requestSent) {
+				NetworkManager.AUTH.STATUS = Auth.CharacterList;
+				NetworkManager.SendSimplePacket(SimplePacketDirection.Auth, new CS_CharacterList());
+				requestSent = true;
 			}
 			return;
 		}
-		*/
+		
+		if (WoWManager.Characters.size() < 1)
+			selectedIndex = -1;
 		
 		/** If we have any characters, draw the highlighter at the first character by default. **/
-		/*
 		if (WoWManager.Characters.size() > 0) {
 			if (characterSelector.x == 0.0 && characterSelector.y == 0.0) {
 				characterSelector.x = characterPortraits[0].x;
@@ -118,7 +127,6 @@ public class StateCharacterSelect implements IState {
 				selectedIndex = 0;
 			}
 		}
-		*/
 		
 		enterWorldButton.tick(engine, display, delta);
 		changeRealmButton.tick(engine, display, delta);
@@ -128,7 +136,6 @@ public class StateCharacterSelect implements IState {
 		
 		InputManager input = display.getInput();
 		
-		/*
 		if (input.isMouseButtonPressed(InputManager.MOUSE_LEFT)) {
 			for (int i = 0; i < characterPortraits.length; i++) {
 				RoundRectangle2D.Double r = characterPortraits[i];
@@ -145,7 +152,6 @@ public class StateCharacterSelect implements IState {
 				}
 			}
 		}
-		*/
 	}
 
 	@Override
@@ -166,45 +172,49 @@ public class StateCharacterSelect implements IState {
 		graphics.setColor(new Color(223, 195, 15));		
 		GraphicsManager.drawString(WoWManager.RealmName, (int)(characterSelectionPanel.x + (characterSelectionPanel.width / 2 - graphics.getFontMetrics().stringWidth(WoWManager.RealmName) / 2)), changeRealmButton.getY() - graphics.getFontMetrics().getHeight() - 12, graphics);
 		
-		if (characterSelector.x != 0.0 && characterSelector.y != 0.0) {
+		if (characterSelector.x != 0.0 && characterSelector.y != 0.0 && selectedIndex > -1) {
 			graphics.setColor(new Color(238, 208, 18, 95));
 			graphics.fill(characterSelector);
 			graphics.setColor(Color.yellow);
 			graphics.draw(characterSelector);
 		}
 		
-		/*
 		if (WoWManager.Characters != null) {
 			if (WoWManager.Characters.size() > 0) {
 				for (int i = 0; i < WoWManager.Characters.size(); i++) {
-					Characters character = WoWManager.Characters.get(i);
+					RealmCharacter character = WoWManager.Characters.get(i);
 					
 					graphics.setFont(display.getGameFont(14f));
 					graphics.setColor(new Color(223, 195, 15));
 					GraphicsManager.drawString(character.Name, (float)characterPortraits[i].x + 5, (float)characterPortraits[i].y, graphics);
-					graphics.setFont(display.getGameFont(12f));
+					graphics.setFont(display.getGameFont(13f));
 					graphics.setColor(Color.white);
-					GraphicsManager.drawString("Level 1 Warrior", (float)characterPortraits[i].x + 5, (float)characterPortraits[i].y + graphics.getFontMetrics().getHeight(), graphics);
+					GraphicsManager.drawString("Level 1 Warrior", (float)characterPortraits[i].x + 5, (float)characterPortraits[i].y + graphics.getFontMetrics().getHeight() + 4, graphics);
 					graphics.setColor(Color.gray);
-					GraphicsManager.drawString(WoWManager.GetZoneName(character.Zone), (float)characterPortraits[i].x + 5, (float)characterPortraits[i].y + (graphics.getFontMetrics().getHeight() * 2), graphics);
+					GraphicsManager.drawString(character.Zone.getName(), (float)characterPortraits[i].x + 5, (float)characterPortraits[i].y + (graphics.getFontMetrics().getHeight() * 2 + 8), graphics);
 				}
 			}
 		}
 		
 		if (selectedIndex > -1) {
 			try {
-				RaceType race = WoWManager.GetRaceType(WoWManager.Characters.get(selectedIndex).Race);
+				RaceType race = WoWManager.Characters.get(selectedIndex).Race;
 				if (race != null) {
-					BufferedImage sprite = race.getSpritesheet().getSubImage(0, 0, 16, 16);
+					BufferedImage sprite = race.getSpritesheet().getSubImage(1, 0, 32, 32);
 					GraphicsManager.drawImage(sprite, display.getWidth() / 2 - sprite.getWidth() / 2, display.getHeight() / 2 - sprite.getHeight() / 2, 48, 48, graphics);
 				}
 			} catch (Exception ex) {}
 		}
-		*/
 	}
 
 	@Override
 	public int getId() {
 		return ID;
+	}
+
+	@Override
+	public void OnStateTransition() {
+		WoWManager.Characters = null;
+		selectedIndex = -1;
 	}
 }

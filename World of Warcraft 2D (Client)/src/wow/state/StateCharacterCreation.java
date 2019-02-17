@@ -20,6 +20,7 @@ import wow.gui.GuiTextField;
 import wow.manager.DisplayManager;
 import wow.manager.GraphicsManager;
 import wow.manager.InputManager;
+import wow.manager.NetworkManager;
 import wow.manager.WoWManager.RaceType;
 
 /**
@@ -49,7 +50,10 @@ public class StateCharacterCreation implements IState {
 		acceptCharacterButton.setLocation(display.getWidth() - acceptCharacterButton.getWidth() - 15, nameTextField.getY());
 		acceptCharacterButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
+				String name = nameTextField.getText().trim();
+				int raceId = racePanel.selectedRace.getId();
 				
+				NetworkManager.SendCharacterCreationPacket(name, raceId);
 			}
 		});
 		
@@ -66,9 +70,7 @@ public class StateCharacterCreation implements IState {
 		try {
 			allianceBanner = ImageIO.read(getClass().getResourceAsStream("/ui/Ally_Banner.png"));
 			hordeBanner = ImageIO.read(getClass().getResourceAsStream("/ui/Horde_Banner.png"));
-		} catch (IOException e) {
-			
-		}
+		} catch (IOException e) {}
 	}
 
 	@Override
@@ -184,5 +186,10 @@ public class StateCharacterCreation implements IState {
 			undeadOption.render(engine, display, graphics);
 			humanOption.render(engine, display, graphics);
 		}
+	}
+
+	@Override
+	public void OnStateTransition() {		
+		nameTextField.setText("");
 	}
 }

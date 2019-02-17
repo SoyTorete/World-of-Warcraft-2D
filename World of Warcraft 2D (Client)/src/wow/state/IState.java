@@ -35,6 +35,13 @@ public interface IState {
 	void render(WoW engine, DisplayManager display, Graphics2D graphics);
 	
 	/**
+	 * Called whenever display.enterState(id) is used.
+	 * @param engine
+	 * @param display
+	 */
+	void OnStateTransition();
+	
+	/**
 	 * 
 	 * @return the state's unique-id.
 	 */

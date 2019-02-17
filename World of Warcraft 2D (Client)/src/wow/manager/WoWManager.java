@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import wow.gfx.Spritesheet;
 import wow.net.Player;
+import wow.net.RealmCharacter;
 
 /**
  * Handles general game-data.
@@ -45,6 +46,7 @@ public class WoWManager {
 	 * @author Xolitude
 	 * @since December 14, 2018
 	 */
+	// DEBUG: Sub-zones need to be added.
 	public enum Zones {
 		TrisfalGlades(1, "Trisfal Glades"),
 		ElwynnForest(2, "Elwynn Forest");
@@ -68,6 +70,7 @@ public class WoWManager {
 	
 	/** The player. **/
 	public static Player Player;
+	public static ArrayList<RealmCharacter> Characters;
 	
 	public static int RealmID;
 	public static String RealmName;
