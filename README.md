@@ -15,14 +15,7 @@ If you aren't one who can contribute code or art, you are more than welcome to o
 # Support
 Over time, I quickly noticed a lot of positivity towards this project and my goal for it as I posted on various forums. I've seen a lot of intrigue. Between working and attending university full-time, I've very little time to work on World of Warcraft 2D. Donations are absolutely _not_ necessary, but if you'd like to make a donation of any amount to help my productivity and support development, I would deeply appreciate it.
 
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-<input type="hidden" name="cmd" value="_donations" />
-<input type="hidden" name="business" value="XFRJBWAD9VVZG" />
-<input type="hidden" name="item_name" value="Support development and future projects" />
-<input type="hidden" name="currency_code" value="USD" />
-<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
-<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
-</form>
+[Paypal](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=XFRJBWAD9VVZG&item_name=Support+development+and+future+projects&currency_code=USD&source=url)
 
 # Disclaimer
 World of Warcraft 2D is in no-way affiliated with Blizzard Entertainment or it's affiliates.
