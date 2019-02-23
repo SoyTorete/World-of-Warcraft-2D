@@ -189,7 +189,7 @@ public class StateCharacterCreation implements IState {
 	}
 
 	@Override
-	public void OnStateTransition() {		
+	public void OnStateTransition(DisplayManager display) {		
 		nameTextField.setText("");
 	}
 }

@@ -12,6 +12,7 @@ import com.esotericsoftware.kryonet.Listener;
 import logon.CS_Login;
 import main.APacket;
 import main.Network;
+import world.SC_WorldConnection;
 import wow.manager.NetworkManager;
 import wow.manager.WoWManager;
 import wow.net.handler.IHandler;
@@ -25,6 +26,7 @@ public class AuthConnection {
 	
 	public enum Auth {
 		Waiting,
+		Disconnected,
 		Credentials,
 		Connecting,
 		ConnectingFailed,

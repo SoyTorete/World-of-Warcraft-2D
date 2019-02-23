@@ -12,6 +12,7 @@ import wow.manager.NotificationManager;
 import wow.state.StateCharacterCreation;
 import wow.state.StateCharacterSelect;
 import wow.state.StateGame;
+import wow.state.StateLoading;
 import wow.state.StateMainMenu;
 
 /**
@@ -42,6 +43,7 @@ public class WoW implements Runnable {
 		display.addState(new StateMainMenu());
 		display.addState(new StateCharacterSelect());
 		display.addState(new StateCharacterCreation());
+		display.addState(new StateLoading());
 		display.addState(new StateGame());
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

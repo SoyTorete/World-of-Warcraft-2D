@@ -94,8 +94,6 @@ public class ZoneParser implements Runnable {
 				}
 			}
 			
-			// TODO: (Server) Add game-object parsing.
-			
 			ZoneManager.AddZone(zone);
 			mapsToParse.remove(map);
 		} while (mapsToParse.size() > 0);

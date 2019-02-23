@@ -10,6 +10,7 @@ import wow.gui.GuiNotificationConfirmation;
 import wow.net.connection.AuthConnection.Auth;
 import wow.state.StateCharacterCreation;
 import wow.state.StateCharacterSelect;
+import wow.state.StateLoading;
 import wow.state.StateMainMenu;
 
 /**
@@ -181,6 +182,16 @@ public class NotificationManager {
 			}
 			if (notification != null) {
 				notification.render(engine, display, graphics);
+			}
+		}
+		
+		if (NetworkManager.WORLD != null) {
+			switch (NetworkManager.WORLD.STATUS) {
+			case WorldOk:
+				display.enterState(StateLoading.ID);
+				break;
+			case Waiting:
+				break;
 			}
 		}
 	}

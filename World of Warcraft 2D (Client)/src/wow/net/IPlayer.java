@@ -66,6 +66,9 @@ public abstract class IPlayer {
 	public abstract void tick(WoW engine, DisplayManager display, double delta);
 	public abstract void render(WoW engine, DisplayManager display, Graphics2D graphics);
 	
+	// DEBUG: Testing purposes.
+	public abstract void OnMove();
+	
 	public void spawn(float x, float y) {
 		this.x = x;
 		this.y = y;

@@ -1,12 +1,17 @@
 package wow.manager;
 
+import java.io.File;
+import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import wow.gfx.Spritesheet;
-import wow.net.Player;
 import wow.net.RealmCharacter;
+import wow.net.WorldCharacter;
+import wow.tiled.TiledMap;
 
 /**
  * Handles general game-data.
@@ -48,15 +53,17 @@ public class WoWManager {
 	 */
 	// DEBUG: Sub-zones need to be added.
 	public enum Zones {
-		TrisfalGlades(1, "Trisfal Glades"),
-		ElwynnForest(2, "Elwynn Forest");
+		TrisfalGlades(1, "Trisfal Glades", "/maps/trisfal_glades.tmx"),
+		ElwynnForest(2, "Elwynn Forest", "/maps/elwynn_forest.tmx");
 		
 		private int id;
 		private String name;
+		private String path;
 		
-		Zones(int id, String name) {
+		Zones(int id, String name, String path) {
 			this.id = id;
 			this.name = name;
+			this.path = path;
 		}
 		
 		public int getId() {
@@ -66,15 +73,29 @@ public class WoWManager {
 		public String getName() {
 			return name;
 		}
+		
+		public File getFile() {
+			try {
+				return new File(getClass().getResource(path).toURI());
+			} catch (URISyntaxException ex) {
+				Logger.getLogger("client").log(Level.SEVERE, "Unable to read zone file: {0}", ex.getMessage());
+			}
+			return null;
+		}
 	}
 	
 	/** The player. **/
-	public static Player Player;
 	public static ArrayList<RealmCharacter> Characters;
+	public static RealmCharacter CharacterInUse;
+	public static WorldCharacter Player;
 	
 	public static int RealmID;
 	public static String RealmName;
 	public static int RealmPort;
+	
+	public static String AccountName;
+	
+	public static TiledMap Map;
 	
 	/** 
 	 * Get the name of a zone based on the given id.

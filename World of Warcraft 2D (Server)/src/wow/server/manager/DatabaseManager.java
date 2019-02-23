@@ -22,9 +22,6 @@ import wow.server.util.Configuration;
  * @since December 2, 2018
  */
 public class DatabaseManager {
-
-	// TODO: (Server) Send "Server Error" message to the client if connections wont open, etc.
-	// TODO: (Server) Use Database Pooling?
 	
 	private static GameServer gameServer;
 	

@@ -14,10 +14,12 @@ import main.APacket;
 import main.Network;
 import wow.server.GameServerGUI.LogType;
 import wow.server.connection.TemporaryConnection;
+import wow.server.connection.WorldConnection;
 import wow.server.handler.CharacterHandler;
 import wow.server.handler.IHandler;
 import wow.server.handler.LoginHandler;
 import wow.server.handler.RealmHandler;
+import wow.server.handler.WorldHandler;
 import wow.server.manager.DatabaseManager;
 import wow.server.manager.RealmManager;
 import wow.server.manager.ZoneManager;
@@ -30,9 +32,7 @@ import wow.server.world.ZoneParser.State;
  * @since November 30, 2018
  */
 public class GameServer {
-	
-	// TODO: (Server) Error checking for character creation, logging in, etc,.
-	
+		
 	/** The salt to be used in authentication. **/
 	public static String SALT = "wow2d_a8.0.0";
 	
@@ -80,8 +80,8 @@ public class GameServer {
 	
 	private GameServerGUI console;
 	
-	private Server auth;
-	private Server world;
+	private static Server auth;
+	private static Server world;
 
 	private LinkedHashMap<String, IHandler> handlers;
 	
@@ -96,6 +96,8 @@ public class GameServer {
 		handlers.put("cs_character_create", new CharacterHandler());
 		handlers.put("cs_character_list", new CharacterHandler());
 		handlers.put("cs_character_delete", new CharacterHandler());
+		handlers.put("cs_world_connection", new WorldHandler());
+		handlers.put("cs_movement", new WorldHandler());
 		
 		/** Give the server time to load the zones. **/
 		ZoneManager.Initialize(this);
@@ -122,22 +124,39 @@ public class GameServer {
 					}
 				}
 			}
-		});
-		auth.addListener(new Listener() {
+			
 			public void disconnected(Connection connection) {
 				String username = "Auth client";
 				TemporaryConnection temp = (TemporaryConnection)connection;
 				if (temp.Username != null && !temp.Username.isEmpty())
 					username = temp.Username;
-				Logger.getLogger("server").log(Level.INFO, "{0} got disconnected.", username);
+				Logger.getLogger("server").log(Level.INFO, "{0} got disconnected from the authentication server.", username);
 			}
 		});
 
 		RealmManager.Initialize(this);
-		world = new Server();
+		world = new Server() {
+			protected Connection newConnection() {
+				Logger.getLogger("server").log(Level.INFO, "World client connected.");
+				return new WorldConnection();
+			}
+		};
 		world.start();
 		world.bind(RealmManager.GetRealms().get(0).getPort(), RealmManager.GetRealms().get(0).getPort()+1);
 		Network.RegisterLib(world.getKryo());
+		world.addListener(new Listener() {
+			public void received(Connection connection, Object object) {
+				for (Map.Entry<String, IHandler> set : handlers.entrySet()) {
+					if (set.getKey().equalsIgnoreCase(object.toString())) {
+						set.getValue().handlePacket(world, connection, (APacket)object);
+					}
+				}
+			}
+			
+			public void disconnected(Connection connection) {
+				// TODO: Disconnect world player.
+			}
+		});
 		
 		if (auth != null && world != null) {
 			Logger.getLogger("server").log(Level.INFO, "AuthServer started on port: {0}", String.valueOf(Configuration.getAuthenticationPort()));
@@ -167,6 +186,20 @@ public class GameServer {
 	 */
 	public GameServerGUI getServerConsole() {
 		return console;
+	}
+	
+	/**
+	 * @return auth
+	 */
+	public static Server getAuthServer() {
+		return auth;
+	}
+	
+	/**
+	 * @return world
+	 */
+	public static Server getWorldServer() {
+		return world;
 	}
 	
 	public static void main(String[] args) {

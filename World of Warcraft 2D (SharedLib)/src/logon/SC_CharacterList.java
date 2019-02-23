@@ -15,7 +15,6 @@ public class SC_CharacterList extends APacket {
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return "sc_character_list";
 	}
 }

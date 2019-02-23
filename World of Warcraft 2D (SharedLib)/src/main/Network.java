@@ -15,6 +15,12 @@ import logon.SC_CharacterDelete;
 import logon.SC_CharacterList;
 import logon.SC_Login;
 import logon.SC_Realmlist;
+import world.CS_Movement;
+import world.CS_WorldConnection;
+import world.SC_MovementUpdate;
+import world.SC_World;
+import world.SC_WorldConnection;
+import world.SC_WorldPosition;
 
 public class Network {
 
@@ -31,5 +37,11 @@ public class Network {
 		kryo.register(ArrayList.class);
 		kryo.register(CS_CharacterDelete.class);
 		kryo.register(SC_CharacterDelete.class);
+		kryo.register(CS_WorldConnection.class);
+		kryo.register(SC_WorldConnection.class);
+		kryo.register(SC_WorldPosition.class);
+		kryo.register(SC_World.class);
+		kryo.register(CS_Movement.class);
+		kryo.register(SC_MovementUpdate.class);
 	}
 }

@@ -5,8 +5,9 @@ For some background, I've been playing World of Warcraft since I was in elementa
 
 # Contributing
 I am fully open to contributions. I don't fully understand multi-user contributions on Github so if anyone has experience in this and how I can help set it up without messing up my local source and the master branch, please reach out to me with the contact information found below.
-
 If you aren't one who can contribute code or art, you are more than welcome to open an issue on the repository and comment your thoughts and ideas there. You will be fully credited :)
+
+To more closely follow development, you are welcome to visit WoW 2D's [Trello](https://trello.com/b/bSbIOhmU/world-of-warcraft-2d) page. I list my weekly goals here.
 
 # Contact
 - davis.tyler1025@gmail.com

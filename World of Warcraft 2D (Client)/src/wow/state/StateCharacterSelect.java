@@ -42,6 +42,9 @@ public class StateCharacterSelect implements IState {
 	private GuiButton backButton;
 	
 	private int selectedIndex = -1;
+	
+	// TODO: Fix character selector highlight bug after deletion.
+	// TODO: Fix enter world bug.
 
 	@Override
 	public void init(DisplayManager display) {
@@ -49,11 +52,13 @@ public class StateCharacterSelect implements IState {
 		characterSelectionPanel.x = display.getWidth() - characterSelectionPanel.getWidth() - 15;
 		characterSelectionPanel.y = 15;
 		
+		// DEBUG: Disable this button until we have a realm-character selected.
 		enterWorldButton = new GuiButton("Enter World");
 		enterWorldButton.setLocation(display.getWidth() / 2 - enterWorldButton.getWidth() / 2, display.getHeight() - enterWorldButton.getHeight() * 2);
 		enterWorldButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				WoWManager.CharacterInUse = WoWManager.Characters.get(selectedIndex);
+				NetworkManager.ConnectToWorld();
 			}
 		});
 		
@@ -213,7 +218,7 @@ public class StateCharacterSelect implements IState {
 	}
 
 	@Override
-	public void OnStateTransition() {
+	public void OnStateTransition(DisplayManager display) {
 		WoWManager.Characters = null;
 		selectedIndex = -1;
 	}

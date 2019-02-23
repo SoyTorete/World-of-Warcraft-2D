@@ -118,7 +118,7 @@ public class DisplayManager {
 			if (state.getId() == id) {
 				activeState = state;
 			}
-			state.OnStateTransition();
+			state.OnStateTransition(this);
 		}
 		if (activeState == null || activeState.getId() != id)
 			System.err.println("Unable to enter game-state with id: "+id+" - missing state.");

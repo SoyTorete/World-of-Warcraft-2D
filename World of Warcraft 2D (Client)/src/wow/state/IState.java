@@ -39,7 +39,7 @@ public interface IState {
 	 * @param engine
 	 * @param display
 	 */
-	void OnStateTransition();
+	void OnStateTransition(DisplayManager display);
 	
 	/**
 	 * 

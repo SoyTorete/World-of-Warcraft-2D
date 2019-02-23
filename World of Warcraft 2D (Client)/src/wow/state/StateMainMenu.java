@@ -21,6 +21,7 @@ import wow.manager.DisplayManager;
 import wow.manager.GraphicsManager;
 import wow.manager.InputManager;
 import wow.manager.NetworkManager;
+import wow.manager.WoWManager;
 
 /**
  * The main-menu state.
@@ -63,6 +64,7 @@ public class StateMainMenu implements IState {
 				usernameTextField.setText("");
 				passwordTextField.setText("");
 
+				WoWManager.AccountName = username;
 				NetworkManager.ConnectToAuth(username, password);
 			}
 		});
@@ -181,6 +183,6 @@ public class StateMainMenu implements IState {
 	}
 
 	@Override
-	public void OnStateTransition() {		
+	public void OnStateTransition(DisplayManager display) {		
 	}
 }
