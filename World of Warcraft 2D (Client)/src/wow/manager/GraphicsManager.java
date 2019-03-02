@@ -45,8 +45,23 @@ public class GraphicsManager {
 	 * @param height
 	 * @param graphics
 	 */
-	public static void drawImage(Image img, float x, float y, int width, int height, Graphics2D graphics) {
-		graphics.drawImage(img, (int)x, (int)y, width, height, null);
+	public static void drawImage(Image img, int x, int y, int width, int height, Graphics2D graphics) {
+		graphics.drawImage(img, x, y, width, height, null);
+	}
+	
+	/**
+	 * Draws an image at the given position using AffineTransform.
+	 * @param img
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @param graphics
+	 */
+	public static void drawImage(Image img, float x, float y, Graphics2D graphics) {
+		AffineTransform xform = new AffineTransform();
+		xform.translate(x, y);
+		graphics.drawImage(img, xform, null);
 	}
 	
 	/**

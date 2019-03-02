@@ -1,14 +1,12 @@
 package wow.state;
 
 import java.awt.Graphics2D;
-import java.io.File;
 
 import wow.WoW;
 import wow.manager.DisplayManager;
 import wow.manager.WoWManager;
-import wow.manager.WoWManager.RaceType;
 import wow.net.Camera;
-import wow.tiled.TiledMap;
+import wow.net.WorldCharacterMP;
 
 /**
  * The game state.
@@ -29,6 +27,9 @@ public class StateGame implements IState {
 	@Override
 	public void tick(WoW engine, DisplayManager display, double delta) {
 		WoWManager.Player.tick(engine, display, delta);
+		for (WorldCharacterMP player : WoWManager.Players) {
+			player.tick(engine, display, delta);
+		}
 	}
 
 	@Override
@@ -36,6 +37,9 @@ public class StateGame implements IState {
 		camera.translate(WoWManager.Player.getX(), WoWManager.Player.getY(), graphics);
 		WoWManager.Map.level.render(graphics);
 		WoWManager.Player.render(engine, display, graphics);
+		for (WorldCharacterMP player : WoWManager.Players) {
+			player.render(engine, display, graphics);
+		}
 	}
 
 	@Override

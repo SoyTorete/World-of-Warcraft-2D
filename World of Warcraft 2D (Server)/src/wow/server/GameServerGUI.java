@@ -95,7 +95,7 @@ public class GameServerGUI {
 		for (int i = 0; i < commands.size(); i++) {
 			ICommand command = commands.get(i);
 			if (cmd.startsWith(command.getPrefix())) {
-				command.handleCommand(server, cmd.split(" "));
+				command.handleCommand(cmd.split(" "));
 			}
 		}
 	}

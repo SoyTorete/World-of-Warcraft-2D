@@ -44,7 +44,6 @@ public class StateCharacterSelect implements IState {
 	private int selectedIndex = -1;
 	
 	// TODO: Fix character selector highlight bug after deletion.
-	// TODO: Fix enter world bug.
 
 	@Override
 	public void init(DisplayManager display) {

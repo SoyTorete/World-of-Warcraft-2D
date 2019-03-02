@@ -64,7 +64,7 @@ public class Animation {
 	 * @param graphics
 	 */
 	public void render(Graphics2D graphics, float x, float y) {
-		GraphicsManager.drawImage(currentFrame.frameImage, x, y, 32, 32, graphics);
+		GraphicsManager.drawImage(currentFrame.frameImage, x, y, graphics);
 	}
 	
 	/**

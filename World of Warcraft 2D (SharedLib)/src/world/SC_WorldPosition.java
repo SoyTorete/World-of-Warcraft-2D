@@ -9,8 +9,8 @@ import main.APacket;
  */
 public class SC_WorldPosition extends APacket {
 
-	public int X;
-	public int Y;
+	public float X;
+	public float Y;
 	
 	@Override
 	public String toString() {

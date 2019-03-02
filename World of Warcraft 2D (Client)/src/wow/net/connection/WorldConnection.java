@@ -23,7 +23,6 @@ public class WorldConnection {
 		Waiting, 
 		Connecting,
 		ConnectingFailed,
-		WorldOk,
 		CharacterPosition,
 		World,
 	}

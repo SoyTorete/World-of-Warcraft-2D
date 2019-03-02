@@ -31,46 +31,57 @@ public class CharacterHandler implements IHandler {
 	
 	@Override
 	public void handlePacket(Connection connection, APacket packet) {
-		if (packet instanceof SC_CharacterCreate) {
-			int code = ((SC_CharacterCreate)packet).Code;
-			
-			switch (code) {
-			case ServerError:
-				NetworkManager.AUTH.STATUS = Auth.CharacterCreateServerError;
-				break;
-			case Exists:
-				NetworkManager.AUTH.STATUS = Auth.CharacterCreateExists;
-				break;
-			case Ok:
-				NetworkManager.AUTH.STATUS = Auth.CharacterCreateOk;
-				break;
-			}
-		} else if (packet instanceof SC_CharacterList) {
-			ArrayList<SC_Character> characters = ((SC_CharacterList)packet).CharacterList;
-			WoWManager.Characters = new ArrayList<RealmCharacter>();
-			if (characters.size() > 0) {
-				for (SC_Character c : characters) {
-					RealmCharacter realmCharacter = new RealmCharacter();
-					realmCharacter.Name = c.Name;
-					
-					for (Zones z : WoWManager.Zones.values()) {
-						if (c.Zone == z.getId()) {
-							realmCharacter.Zone = z;
-						}
-					}
-					
-					for (RaceType r : WoWManager.RaceType.values()) {
-						if (c.Race == r.getId()) {
-							realmCharacter.Race = r;
-						}
-					}
-					WoWManager.Characters.add(realmCharacter);
-				}
-			}
-			NetworkManager.AUTH.STATUS = Auth.Waiting;
-		} else if (packet instanceof SC_CharacterDelete) {
-			NetworkManager.AUTH.STATUS = Auth.CharacterList;
-			NetworkManager.SendSimplePacket(SimplePacketDirection.Auth, new CS_CharacterList());
+		if (packet instanceof SC_CharacterCreate)
+			handleCharacterCreation((SC_CharacterCreate)packet);
+		else if (packet instanceof SC_CharacterList)
+			handleCharacterList((SC_CharacterList)packet);
+		else if (packet instanceof SC_CharacterDelete)
+			handleCharacterDelete((SC_CharacterDelete)packet);
+	}
+	
+	private void handleCharacterCreation(SC_CharacterCreate packet) {
+		int code = packet.Code;
+		
+		switch (code) {
+		case ServerError:
+			NetworkManager.AUTH.STATUS = Auth.CharacterCreateServerError;
+			break;
+		case Exists:
+			NetworkManager.AUTH.STATUS = Auth.CharacterCreateExists;
+			break;
+		case Ok:
+			NetworkManager.AUTH.STATUS = Auth.CharacterCreateOk;
+			break;
 		}
+	}
+	
+	private void handleCharacterList(SC_CharacterList packet) {
+		ArrayList<SC_Character> characters = ((SC_CharacterList)packet).CharacterList;
+		WoWManager.Characters = new ArrayList<RealmCharacter>();
+		if (characters.size() > 0) {
+			for (SC_Character c : characters) {
+				RealmCharacter realmCharacter = new RealmCharacter();
+				realmCharacter.Name = c.Name;
+				
+				for (Zones z : WoWManager.Zones.values()) {
+					if (c.Zone == z.getId()) {
+						realmCharacter.Zone = z;
+					}
+				}
+				
+				for (RaceType r : WoWManager.RaceType.values()) {
+					if (c.Race == r.getId()) {
+						realmCharacter.Race = r;
+					}
+				}
+				WoWManager.Characters.add(realmCharacter);
+			}
+		}
+		NetworkManager.AUTH.STATUS = Auth.Waiting;
+	}
+	
+	private void handleCharacterDelete(SC_CharacterDelete packet) {
+		NetworkManager.AUTH.STATUS = Auth.CharacterList;
+		NetworkManager.SendSimplePacket(SimplePacketDirection.Auth, new CS_CharacterList());
 	}
 }

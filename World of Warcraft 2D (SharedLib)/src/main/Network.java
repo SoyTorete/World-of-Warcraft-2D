@@ -17,7 +17,12 @@ import logon.SC_Login;
 import logon.SC_Realmlist;
 import world.CS_Movement;
 import world.CS_WorldConnection;
+import world.SC_MovementToAll;
 import world.SC_MovementUpdate;
+import world.SC_PlayerConnect;
+import world.SC_PlayerDisconnect;
+import world.SC_Player;
+import world.SC_PlayerList;
 import world.SC_World;
 import world.SC_WorldConnection;
 import world.SC_WorldPosition;
@@ -40,8 +45,13 @@ public class Network {
 		kryo.register(CS_WorldConnection.class);
 		kryo.register(SC_WorldConnection.class);
 		kryo.register(SC_WorldPosition.class);
+		kryo.register(SC_Player.class);
+		kryo.register(SC_PlayerList.class);
+		kryo.register(SC_PlayerConnect.class);
 		kryo.register(SC_World.class);
 		kryo.register(CS_Movement.class);
 		kryo.register(SC_MovementUpdate.class);
+		kryo.register(SC_MovementToAll.class);
+		kryo.register(SC_PlayerDisconnect.class);
 	}
 }

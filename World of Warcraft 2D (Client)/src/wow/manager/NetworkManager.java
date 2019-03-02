@@ -39,8 +39,13 @@ public class NetworkManager {
 		HANDLERS.put("sc_character_delete", new CharacterHandler());
 		HANDLERS.put("sc_world_connection", new WorldHandler());
 		HANDLERS.put("sc_world_position", new WorldHandler());
+		HANDLERS.put("sc_player", new WorldHandler());
+		HANDLERS.put("sc_player_list", new WorldHandler());
 		HANDLERS.put("sc_world", new WorldHandler());
 		HANDLERS.put("sc_movement_update", new WorldHandler());
+		HANDLERS.put("sc_movement_toall", new WorldHandler());
+		HANDLERS.put("sc_player_connect", new WorldHandler());
+		HANDLERS.put("sc_player_disconnect", new WorldHandler());
 	}
 	
 	public static void ConnectToAuth(String username, String password) {
@@ -79,9 +84,10 @@ public class NetworkManager {
 	/* End auth packets */
 	
 	/* Begin world packets */
-	public static void SendMovement(int direction) {
+	public static void SendMovement(int direction, boolean isMoving) {
 		CS_Movement packet = new CS_Movement();
 		packet.Direction = direction;
+		packet.IsMoving = isMoving;
 		
 		WORLD.getClient().sendUDP(packet);
 	}

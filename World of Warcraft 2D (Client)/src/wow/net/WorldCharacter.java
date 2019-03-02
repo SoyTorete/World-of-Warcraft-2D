@@ -14,38 +14,16 @@ import wow.net.IPlayer.Direction;
 public class WorldCharacter extends IPlayer {
 
 	private PlayerController controller;
+	private boolean hasSentIdle = false;
 
 	public WorldCharacter(RaceType race, String name) {
 		super(race, name);
 		
+		northAnimation = race.getNorthAnimation();
+		eastAnimation = race.getEastAnimation();
+		southAnimation = race.getSouthAnimation();
+		westAnimation = race.getWestAnimation();
 		controller = new PlayerController(this);
-	}
-
-	@Override
-	public void initAnimations() {
-		northAnimation = new Animation();
-		northAnimation.addFrame(race.getSpritesheet().getSubImage(1, 3, 32, 32), 12);
-		northAnimation.addFrame(race.getSpritesheet().getSubImage(2, 3, 32, 32), 12);
-		northAnimation.addFrame(race.getSpritesheet().getSubImage(1, 3, 32, 32), 12);
-		northAnimation.addFrame(race.getSpritesheet().getSubImage(0, 3, 32, 32), 12);
-		
-		eastAnimation = new Animation();
-		eastAnimation.addFrame(race.getSpritesheet().getSubImage(1, 2, 32, 32), 12);
-		eastAnimation.addFrame(race.getSpritesheet().getSubImage(2, 2, 32, 32), 12);
-		eastAnimation.addFrame(race.getSpritesheet().getSubImage(1, 2, 32, 32), 12);
-		eastAnimation.addFrame(race.getSpritesheet().getSubImage(0, 2, 32, 32), 12);
-
-		southAnimation = new Animation();
-		southAnimation.addFrame(race.getSpritesheet().getSubImage(1, 0, 32, 32), 12);
-		southAnimation.addFrame(race.getSpritesheet().getSubImage(2, 0, 32, 32), 12);
-		southAnimation.addFrame(race.getSpritesheet().getSubImage(1, 0, 32, 32), 12);
-		southAnimation.addFrame(race.getSpritesheet().getSubImage(0, 0, 32, 32), 12);
-
-		westAnimation = new Animation();
-		westAnimation.addFrame(race.getSpritesheet().getSubImage(1, 1, 32, 32), 12);
-		westAnimation.addFrame(race.getSpritesheet().getSubImage(2, 1, 32, 32), 12);
-		westAnimation.addFrame(race.getSpritesheet().getSubImage(1, 1, 32, 32), 12);
-		westAnimation.addFrame(race.getSpritesheet().getSubImage(0, 1, 32, 32), 12);
 	}
 
 	@Override
@@ -88,6 +66,19 @@ public class WorldCharacter extends IPlayer {
 		
 		OnMove();
 	}
+	
+	@Override
+	public void OnMove() {
+		if (isMovingUp || isMovingDown || isMovingLeft || isMovingRight) {
+			hasSentIdle = false;
+			NetworkManager.SendMovement(direction.getDirection(), true);
+		} else {
+			if (!hasSentIdle) {
+				NetworkManager.SendMovement(direction.getDirection(), false);
+				hasSentIdle = true;
+			}
+		}
+	}
 
 	@Override
 	public void render(WoW engine, DisplayManager display, Graphics2D graphics) {
@@ -122,13 +113,6 @@ public class WorldCharacter extends IPlayer {
 				westAnimation.render(graphics, x, y);
 				break;
 			}
-		}
-	}
-	
-	@Override
-	public void OnMove() {
-		if (isMovingUp || isMovingDown || isMovingLeft || isMovingRight) {
-			NetworkManager.SendMovement(direction.getDirection());
 		}
 	}
 	

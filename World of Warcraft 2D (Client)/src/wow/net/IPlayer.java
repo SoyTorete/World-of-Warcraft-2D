@@ -2,6 +2,8 @@ package wow.net;
 
 import java.awt.Graphics2D;
 
+import javax.swing.SwingUtilities;
+
 import wow.WoW;
 import wow.gfx.Animation;
 import wow.manager.DisplayManager;
@@ -54,19 +56,14 @@ public abstract class IPlayer {
 	public IPlayer(RaceType race, String name) {
 		this.race = race;
 		this.name = name;
-		
-		initAnimations();
 	}
-	
-	/**
-	 * Create the animations.
-	 */
-	public abstract void initAnimations();
 	
 	public abstract void tick(WoW engine, DisplayManager display, double delta);
 	public abstract void render(WoW engine, DisplayManager display, Graphics2D graphics);
 	
-	// DEBUG: Testing purposes.
+	/**
+	 * Called every tick.
+	 */
 	public abstract void OnMove();
 	
 	public void spawn(float x, float y) {

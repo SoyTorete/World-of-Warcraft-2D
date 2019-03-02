@@ -9,10 +9,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import wow.server.GameServer;
-import wow.server.GameServer.AccountLevel;
 import wow.server.GameServerGUI.LogType;
-import wow.server.manager.DatabaseManager;
-import wow.server.manager.DatabaseManager.QueryState;
+import wow.server.manager.AccountManager;
+import wow.server.manager.AccountManager.AccountLevel;
 import wow.server.util.BCrypt;
 
 /**
@@ -32,7 +31,7 @@ public class CommandAccount extends ICommand {
 		
 		/** Register sub-commands with a method. **/
 		try {
-			subCommands.put("create", this.getClass().getDeclaredMethod("handleCreation", GameServer.class, String[].class));
+			subCommands.put("create", this.getClass().getDeclaredMethod("handleCreation", String[].class));
 		} catch (NoSuchMethodException e) {
 			e.printStackTrace();
 		} catch (SecurityException e) {
@@ -41,9 +40,9 @@ public class CommandAccount extends ICommand {
 	}
 
 	@Override
-	public void handleCommand(GameServer server, String[] args) {
+	public void handleCommand(String[] args) {
 		if (args.length == 1) 
-			server.getServerConsole().writeMessage(LogType.Server, toString());
+			GameServer.getServerConsole().writeMessage(LogType.Server, toString());
 		
 		if (args.length >= 2) {
 			String subCommand = args[1];
@@ -51,7 +50,7 @@ public class CommandAccount extends ICommand {
 				if (set.getKey().equals(subCommand)) {
 					Method method = set.getValue();
 					try {
-						method.invoke(this, (Object)server, (Object)args);
+						method.invoke(this, (Object)args);
 					} catch (IllegalAccessException e) {
 						e.printStackTrace();
 					} catch (IllegalArgumentException e) {
@@ -68,7 +67,7 @@ public class CommandAccount extends ICommand {
 	 * Handle the 'create' sub-command.
 	 * @param args
 	 */
-	private void handleCreation(GameServer server, String[] args) {
+	private void handleCreation(String[] args) {
 		int code = OK; /** Checks for errors. **/
 		if (args.length < 4)
 			code = ARGUMENTS;
@@ -77,7 +76,7 @@ public class CommandAccount extends ICommand {
 		
 		switch (code) {
 		case ARGUMENTS:
-			server.getServerConsole().writeMessage(LogType.Server, "Usage: account create [username] [password].");
+			GameServer.getServerConsole().writeMessage(LogType.Server, "Usage: account create [username] [password].");
 			return;
 		}
 		
@@ -96,20 +95,8 @@ public class CommandAccount extends ICommand {
 			bcrypt_hash = BCrypt.hashpw(shaHashedPassword+GameServer.SALT, bcrypt_salt);
 		} catch (NoSuchAlgorithmException ex) {}
 		
-		if (bcrypt_salt != null && bcrypt_hash != null) {
-			QueryState state = DatabaseManager.CreateAccount(username, bcrypt_hash, bcrypt_salt);
-			switch (state) {
-			case Success:
-				server.getServerConsole().writeMessage(LogType.Logon, String.format("Account created: %s", username));
-				break;
-			case Exists:
-				server.getServerConsole().writeMessage(LogType.Logon, String.format("Unable to create account, '%s' already exists.", username));
-				break;
-			case ConnectionError:
-				server.getServerConsole().writeMessage(LogType.Logon, "A connection error occured while attempting to create an account.");
-				break;
-			}
-		}
+		if (bcrypt_salt != null && bcrypt_hash != null)
+			AccountManager.CreateAccount(username, bcrypt_hash, bcrypt_salt);
 	}
 
 	@Override

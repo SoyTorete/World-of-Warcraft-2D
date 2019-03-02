@@ -34,11 +34,13 @@ public class AuthConnection {
 		AuthenticatingUnk,
 		AuthenticatingIncorrect,
 		AuthenticatingOk,
+		AlreadyOnline,
 		RealmlistReceived,
 		CharacterCreateOk,
 		CharacterCreateExists,
 		CharacterCreateServerError,
 		CharacterList,
+		World
 	}
 	
 	private Client client;
@@ -78,6 +80,10 @@ public class AuthConnection {
 						set.getValue().handlePacket(client, (APacket)object);
 					}
 				}
+			}
+			
+			public void disconnected(Connection connection) {
+				connection.close();
 			}
 		});
 	}

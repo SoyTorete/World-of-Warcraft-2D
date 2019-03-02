@@ -9,9 +9,11 @@ import com.esotericsoftware.kryonet.Server;
 import logon.CS_Login;
 import logon.SC_Login;
 import main.APacket;
+import wow.server.Account;
 import wow.server.GameServer;
 import wow.server.connection.TemporaryConnection;
-import wow.server.manager.DatabaseManager;
+import wow.server.connection.WorldConnection;
+import wow.server.manager.AccountManager;
 import wow.server.util.BCrypt;
 
 /**
@@ -22,6 +24,7 @@ import wow.server.util.BCrypt;
 public class LoginHandler implements IHandler {
 	
 	private final int Unk = 10;
+	private final int Online = 2;
 	private final int Incorrect = 1;
 	private final int Ok = 0;
 
@@ -31,32 +34,35 @@ public class LoginHandler implements IHandler {
         CS_Login sub_packet = (CS_Login)packet;
         String username = sub_packet.Username.toUpperCase();
         String password = sub_packet.Password;
-        
-		Logger.getLogger("server").log(Level.INFO, "{0} is logging in.", username);
-        
-        String[] data = DatabaseManager.AccountExists(username);
         SC_Login response = new SC_Login();
         
-        if (data == null) { // Send unk.
-        	response.Code = Unk;
-        	temp.sendTCP(response);
-        	temp.close();
-        } else {
-        	String dbPassword = data[0];
-        	String dbSalt = data[1];
-        	// wait to pull id.
-        	
-        	String hashed = BCrypt.hashpw(password+GameServer.SALT, dbSalt);
-        	if (dbPassword.equalsIgnoreCase(hashed)) {
-        		temp.Username = username;
-        		temp.UserID = Integer.valueOf(data[2]);
-        		response.Code = Ok;
-        		temp.sendTCP(response);
-        	} else {
-        		response.Code = Incorrect;
-        		temp.sendTCP(response);
-        		temp.close();
-        	}
-        }
+		Logger.getLogger("server").log(Level.INFO, "{0} is logging in.", username);
+		Account account = AccountManager.Exists(username);
+		if (account == null) {
+			response.Code = Unk;
+			temp.sendTCP(response);
+			temp.close();
+			return;
+		}
+		
+		boolean online = GameServer.isAccountOnline(username);
+		if (online) {
+			response.Code = Online;
+			temp.sendTCP(response);
+			temp.close();
+			return;
+		}
+		
+		String hashCheck = BCrypt.hashpw(password+GameServer.SALT, account.Salt);
+		if (account.HashedPassword.equalsIgnoreCase(hashCheck)) {
+			temp.Account = account;
+			
+			response.Code = Ok;
+			temp.sendTCP(response);
+		} else {
+			response.Code = Incorrect;
+			temp.sendTCP(response);
+			temp.close();
+		}
     }
 }

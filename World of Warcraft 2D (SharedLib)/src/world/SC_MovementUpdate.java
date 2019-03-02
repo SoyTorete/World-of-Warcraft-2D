@@ -9,8 +9,8 @@ import main.APacket;
  */
 public class SC_MovementUpdate extends APacket {
 	
-	public int NewX;
-	public int NewY;
+	public float NewX;
+	public float NewY;
 
 	@Override
 	public String toString() {

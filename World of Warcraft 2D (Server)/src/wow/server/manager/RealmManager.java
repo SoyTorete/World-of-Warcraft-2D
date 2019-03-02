@@ -22,14 +22,16 @@ public class RealmManager {
 	 * @param server
 	 */
 	public static void Initialize(GameServer server) {
-		realms = DatabaseManager.FetchRealms();
+		realms = new ArrayList<Realm>();
+		realms.add(new Realm(1, "PTR a0.8.0", 6771));
+		
 		if (realms.size() == 0) {
 			Logger.getLogger("server").log(Level.SEVERE, "No realms were found!");
 			server.stop();
 		}
 		
 		for (Realm realm : realms) {
-			server.getServerConsole().writeMessage(LogType.Logon, String.format("Added realm: %s:%s", realm.name, realm.port));
+			GameServer.getServerConsole().writeMessage(LogType.Logon, String.format("Added realm: %s:%s", realm.name, realm.port));
 			Logger.getLogger("server").log(Level.INFO, "Added realm: {0}:{1}", new Object[] {realm.name, String.valueOf(realm.port)});
 		}
 	}

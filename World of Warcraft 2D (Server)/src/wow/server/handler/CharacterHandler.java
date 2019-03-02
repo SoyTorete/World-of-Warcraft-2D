@@ -15,10 +15,10 @@ import logon.SC_CharacterCreate;
 import logon.SC_CharacterDelete;
 import logon.SC_CharacterList;
 import main.APacket;
+import wow.server.Player;
 import wow.server.connection.TemporaryConnection;
-import wow.server.manager.DatabaseManager;
-import wow.server.manager.DatabaseManager.QueryState;
-import wow.server.manager.ZoneManager;
+import wow.server.manager.AccountManager;
+import wow.server.manager.AccountManager.QueueState;
 
 /**
  * Handles character-type requests.
@@ -30,47 +30,61 @@ public class CharacterHandler implements IHandler {
 	private final int ServerError = -1;
 	private final int Exists = 1;
 	private final int Ok = 0;
+	
+	private void handleCharacterCreate(TemporaryConnection connection, CS_CharacterCreate packet) {
+		String name = packet.Name;
+		int raceId = packet.RaceID;
+		int realmId = connection.RealmID;
+		
+		QueueState state = AccountManager.CreateCharacter(connection.Account, name, raceId, realmId);
+		SC_CharacterCreate packet_fwd = new SC_CharacterCreate();
+		switch (state) {
+		case Success:
+			packet_fwd.Code = Ok;
+			break;
+		case Failed:
+			packet_fwd.Code = Exists;
+			break;
+		case Error:
+			packet_fwd.Code = ServerError;
+			break;
+		}
+		connection.sendTCP(packet_fwd);
+	}
+	
+	private void handleCharacterList(TemporaryConnection connection) {
+		Logger.getLogger("server").log(Level.INFO, "{0} sent the character-list packet.", connection.Account.Username);
+		
+		ArrayList<SC_Character> characters = new ArrayList<SC_Character>();
+		for (Player player : connection.Account.Characters) {
+			if (player.RealmID == connection.RealmID) {
+				SC_Character character = new SC_Character();
+				character.Name = player.Name;
+				character.Zone = player.ZoneID;
+				character.Race = player.RaceID;
+				characters.add(character);
+			}
+		}
+		SC_CharacterList packet = new SC_CharacterList();
+		packet.CharacterList = characters;
+		connection.sendTCP(packet);
+	}
+	
+	private void handleCharacterDelete(TemporaryConnection connection, String characterName) {
+		// TODO: handle delete state.
+		AccountManager.DeleteCharacter(connection.Account, characterName);
+		connection.sendTCP(new SC_CharacterDelete());
+	}
 
 	@Override
 	public void handlePacket(Server server, Connection connection, APacket packet) {
 		TemporaryConnection temp = (TemporaryConnection) connection;
 		if (packet instanceof CS_CharacterCreate) {
-			CS_CharacterCreate sub_packet = (CS_CharacterCreate) packet;
-			
-			String name = sub_packet.Name;
-			int raceId = sub_packet.RaceID;
-			int userId = temp.UserID;
-			int realmId = temp.RealmID;
-			name = name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
-			int zoneId = ZoneManager.GetZoneSpawnForRace(raceId);
-			
-			QueryState state = DatabaseManager.CreateCharacter(name, raceId, userId, realmId, zoneId);
-			SC_CharacterCreate packet_fwd = new SC_CharacterCreate();
-			switch (state) {
-			case Success:
-				packet_fwd.Code = Ok;
-				Logger.getLogger("server").log(Level.INFO, "{0} created character: (Name:{1};Race:{2})", new Object[] {temp.Username, name, raceId});
-				break;
-			case Exists:
-				packet_fwd.Code = Exists;
-				break;
-			case ConnectionError:
-				packet_fwd.Code = ServerError;
-				break;
-			}
-			temp.sendTCP(packet_fwd);
+			handleCharacterCreate(temp, (CS_CharacterCreate)packet);
 		} else if (packet instanceof CS_CharacterList) {
-			Logger.getLogger("server").log(Level.INFO, "{0} sent the character-list packet.", temp.Username);
-			ArrayList<SC_Character> characters = DatabaseManager.GetCharactersForUser(temp.UserID, temp.RealmID);
-			SC_CharacterList sub_packet = new SC_CharacterList();
-			sub_packet.CharacterList = characters;
-			temp.sendTCP(sub_packet);
+			handleCharacterList(temp);
 		} else if (packet instanceof CS_CharacterDelete) {
-			String name = ((CS_CharacterDelete)packet).Name;
-			DatabaseManager.DeleteCharacter(name, temp.UserID, temp.RealmID);
-			Logger.getLogger("server").log(Level.INFO, "{0} deleted character: {1}", new Object[] {temp.Username, name});
-			
-			temp.sendTCP(new SC_CharacterDelete());
+			handleCharacterDelete(temp, ((CS_CharacterDelete)packet).Name);
 		}
 	}
 }

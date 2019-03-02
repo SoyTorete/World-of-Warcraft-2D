@@ -12,6 +12,7 @@ import com.esotericsoftware.kryonet.Server;
 
 import main.APacket;
 import main.Network;
+import world.SC_PlayerDisconnect;
 import wow.server.GameServerGUI.LogType;
 import wow.server.connection.TemporaryConnection;
 import wow.server.connection.WorldConnection;
@@ -20,7 +21,7 @@ import wow.server.handler.IHandler;
 import wow.server.handler.LoginHandler;
 import wow.server.handler.RealmHandler;
 import wow.server.handler.WorldHandler;
-import wow.server.manager.DatabaseManager;
+import wow.server.manager.AccountManager;
 import wow.server.manager.RealmManager;
 import wow.server.manager.ZoneManager;
 import wow.server.util.Configuration;
@@ -32,31 +33,9 @@ import wow.server.world.ZoneParser.State;
  * @since November 30, 2018
  */
 public class GameServer {
-		
-	/** The salt to be used in authentication. **/
-	public static String SALT = "wow2d_a8.0.0";
 	
-	/**
-	 * The different levels of security an account can be.
-	 * @author Xolitude
-	 * @since November 30, 2018
-	 */
-	public enum AccountLevel {
-		Player(0),
-		Moderator(1),
-		Gamemaster(2),
-		Administrator(3);
-		
-		private int level;
-		
-		AccountLevel(int level) {
-			this.level = level;
-		}
-		
-		public int getLevel() {
-			return level;
-		}
-	}
+	/** The salt to be used in authentication. **/
+	public static final String SALT = "wow2d_a8.0.0";
 	
 	/**
 	 * The different race-types.
@@ -78,7 +57,7 @@ public class GameServer {
 		}
 	}
 	
-	private GameServerGUI console;
+	private static GameServerGUI console;
 	
 	private static Server auth;
 	private static Server world;
@@ -99,16 +78,14 @@ public class GameServer {
 		handlers.put("cs_world_connection", new WorldHandler());
 		handlers.put("cs_movement", new WorldHandler());
 		
+		Configuration.Initialize();
+		AccountManager.Initialize();
 		/** Give the server time to load the zones. **/
 		ZoneManager.Initialize(this);
 		do {} while (ZoneManager.GetParseState() == State.Loading);
 		
-		Configuration.Initialize();
-		DatabaseManager.Initialize(this);
-		
 		auth = new Server() {
 			protected Connection newConnection() {
-				Logger.getLogger("server").log(Level.INFO, "Auth client connected.");
 				return new TemporaryConnection();
 			}
 		};
@@ -128,8 +105,9 @@ public class GameServer {
 			public void disconnected(Connection connection) {
 				String username = "Auth client";
 				TemporaryConnection temp = (TemporaryConnection)connection;
-				if (temp.Username != null && !temp.Username.isEmpty())
-					username = temp.Username;
+				if (temp.Account != null) {
+					username = temp.Account.Username;
+				}
 				Logger.getLogger("server").log(Level.INFO, "{0} got disconnected from the authentication server.", username);
 			}
 		});
@@ -137,7 +115,6 @@ public class GameServer {
 		RealmManager.Initialize(this);
 		world = new Server() {
 			protected Connection newConnection() {
-				Logger.getLogger("server").log(Level.INFO, "World client connected.");
 				return new WorldConnection();
 			}
 		};
@@ -153,16 +130,54 @@ public class GameServer {
 				}
 			}
 			
+			// TODO: Save player data, send to all other players, etc,.
 			public void disconnected(Connection connection) {
-				// TODO: Disconnect world player.
+				WorldConnection worldConnection = (WorldConnection) connection;
+				
+				SC_PlayerDisconnect disconnect = new SC_PlayerDisconnect();
+				disconnect.Name = worldConnection.Account.OnlinePlayer.Name;
+				for (Connection c : world.getConnections()) {
+					WorldConnection wC = (WorldConnection)c;
+					if (!wC.Account.Username.equalsIgnoreCase(worldConnection.Account.Username)) {
+						wC.sendTCP(disconnect);
+					}
+				}
+				ZoneManager.RemovePlayerFromZone(worldConnection.Account.OnlinePlayer);
 			}
-		});
+		});		
 		
 		if (auth != null && world != null) {
 			Logger.getLogger("server").log(Level.INFO, "AuthServer started on port: {0}", String.valueOf(Configuration.getAuthenticationPort()));
 			Logger.getLogger("server").log(Level.INFO, "WorldServer started on ports: {0}:{1}", new Object[] {String.valueOf(RealmManager.GetRealms().get(0).getPort()), String.valueOf(RealmManager.GetRealms().get(0).getPort()+1)});
 		} else 
 			stop();
+	}
+	
+	/**
+	 * Is this account already logged in?
+	 * @param username
+	 * @return true, otherwise false
+	 */
+	public static boolean isAccountOnline(String username) {
+		// NOTE: Check temporary (auth) connections first.
+		for (Connection c : auth.getConnections()) {
+			TemporaryConnection temp = (TemporaryConnection)c;
+			if (temp.Account != null) {
+				if (temp.Account.Username.equalsIgnoreCase(username)) {
+					return true;
+				}
+			}
+		}
+		
+		// NOTE: Check world connections next.
+		for (Connection c : world.getConnections()) {
+			WorldConnection worldC = (WorldConnection)c;
+			if (worldC.Account.Username.equalsIgnoreCase(username)) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -184,7 +199,7 @@ public class GameServer {
 	 * Get the game-server's gui.
 	 * @return gui
 	 */
-	public GameServerGUI getServerConsole() {
+	public static GameServerGUI getServerConsole() {
 		return console;
 	}
 	

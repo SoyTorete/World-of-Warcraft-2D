@@ -46,7 +46,7 @@ public class ZoneParser implements Runnable {
 	}
 	
 	public synchronized void start() {
-		server.getServerConsole().writeMessage(LogType.Server, String.format("Loading %s zone(s)...", mapsToParse.size()));
+		GameServer.getServerConsole().writeMessage(LogType.Server, String.format("Loading %s zone(s)...", mapsToParse.size()));
 				
 		thread = new Thread(this, "parser");
 		thread.start();
@@ -98,7 +98,7 @@ public class ZoneParser implements Runnable {
 			mapsToParse.remove(map);
 		} while (mapsToParse.size() > 0);
 		long stop = System.currentTimeMillis();
-		server.getServerConsole().writeMessage(LogType.Server, String.format("Loaded zones in %sms.", stop - start));
+		GameServer.getServerConsole().writeMessage(LogType.Server, String.format("Loaded zones in %sms.", stop - start));
 		state = State.Finished;
 	}
 	

@@ -1,7 +1,6 @@
 package wow.server.command;
 
-import wow.server.GameServer;
-import wow.server.GameServer.AccountLevel;
+import wow.server.manager.AccountManager.AccountLevel;
 
 /**
  * An abstract class for commands.
@@ -18,7 +17,7 @@ public abstract class ICommand {
 		this.level = level;
 	}
 	
-	public abstract void handleCommand(GameServer server, String[] args);
+	public abstract void handleCommand(String[] args);
 	
 	public String getPrefix() {
 		return prefix;

@@ -12,6 +12,7 @@ import wow.net.connection.AuthConnection.Auth;
 public class LoginHandler implements IHandler {
 	
 	private final int Unk = 10;
+	private final int Online = 2;
 	private final int Incorrect = 1;
 	private final int Ok = 0;
 
@@ -22,6 +23,9 @@ public class LoginHandler implements IHandler {
 		switch (code) {
 		case Unk:
 			NetworkManager.AUTH.STATUS = Auth.AuthenticatingUnk;
+			break;
+		case Online:
+			NetworkManager.AUTH.STATUS = Auth.AlreadyOnline;
 			break;
 		case Incorrect:
 			NetworkManager.AUTH.STATUS = Auth.AuthenticatingIncorrect;

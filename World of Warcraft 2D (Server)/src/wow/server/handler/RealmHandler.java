@@ -16,7 +16,7 @@ public class RealmHandler implements IHandler {
 	@Override
 	public void handlePacket(Server server, Connection connection, APacket packet) {
 		TemporaryConnection temp = (TemporaryConnection)connection;
-		Logger.getLogger("server").log(Level.INFO, "{0} sent the realmlist packet.", temp.Username);
+		Logger.getLogger("server").log(Level.INFO, "{0} sent the realmlist packet.", temp.Account.Username);
 		
 		SC_Realmlist sub_packet = new SC_Realmlist();
 		sub_packet.ID = RealmManager.GetRealms().get(0).getId();

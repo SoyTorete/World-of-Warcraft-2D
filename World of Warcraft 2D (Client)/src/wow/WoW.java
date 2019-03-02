@@ -32,7 +32,7 @@ public class WoW implements Runnable {
 	private int renderedFps;
 	
 	protected double delta;
-	
+		
 	/**
 	 * Initialize the display and start the engine.
 	 */

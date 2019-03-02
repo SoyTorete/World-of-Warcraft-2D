@@ -10,6 +10,7 @@ import main.APacket;
 public class CS_Movement extends APacket {
 
 	public int Direction;
+	public boolean IsMoving;
 	
 	@Override
 	public String toString() {
