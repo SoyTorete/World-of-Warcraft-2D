@@ -26,7 +26,7 @@ import wow.state.IState;
 public class DisplayManager {
 
 	private final String title = "World of Warcraft 2D";
-	private final String version = "v0.8.0a (development)";
+	private final String version = "v0.9.0a (development)";
 	
 	private JFrame frame;
 	private Canvas canvas;

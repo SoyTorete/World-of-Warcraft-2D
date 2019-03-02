@@ -18,12 +18,34 @@ public class WorldCharacter extends IPlayer {
 
 	public WorldCharacter(RaceType race, String name) {
 		super(race, name);
-		
-		northAnimation = race.getNorthAnimation();
-		eastAnimation = race.getEastAnimation();
-		southAnimation = race.getSouthAnimation();
-		westAnimation = race.getWestAnimation();
 		controller = new PlayerController(this);
+	}
+	
+	@Override
+	public void initAnimations() {
+		northAnimation = new Animation();
+		northAnimation.addFrame(race.getSpritesheet().getSubImage(1, 3, 32, 32), 12);
+		northAnimation.addFrame(race.getSpritesheet().getSubImage(2, 3, 32, 32), 12);
+		northAnimation.addFrame(race.getSpritesheet().getSubImage(1, 3, 32, 32), 12);
+		northAnimation.addFrame(race.getSpritesheet().getSubImage(0, 3, 32, 32), 12);
+		
+		eastAnimation = new Animation();
+		eastAnimation.addFrame(race.getSpritesheet().getSubImage(1, 2, 32, 32), 12);
+		eastAnimation.addFrame(race.getSpritesheet().getSubImage(2, 2, 32, 32), 12);
+		eastAnimation.addFrame(race.getSpritesheet().getSubImage(1, 2, 32, 32), 12);
+		eastAnimation.addFrame(race.getSpritesheet().getSubImage(0, 2, 32, 32), 12);
+
+		southAnimation = new Animation();
+		southAnimation.addFrame(race.getSpritesheet().getSubImage(1, 0, 32, 32), 12);
+		southAnimation.addFrame(race.getSpritesheet().getSubImage(2, 0, 32, 32), 12);
+		southAnimation.addFrame(race.getSpritesheet().getSubImage(1, 0, 32, 32), 12);
+		southAnimation.addFrame(race.getSpritesheet().getSubImage(0, 0, 32, 32), 12);
+
+		westAnimation = new Animation();
+		westAnimation.addFrame(race.getSpritesheet().getSubImage(1, 1, 32, 32), 12);
+		westAnimation.addFrame(race.getSpritesheet().getSubImage(2, 1, 32, 32), 12);
+		westAnimation.addFrame(race.getSpritesheet().getSubImage(1, 1, 32, 32), 12);
+		westAnimation.addFrame(race.getSpritesheet().getSubImage(0, 1, 32, 32), 12);
 	}
 
 	@Override

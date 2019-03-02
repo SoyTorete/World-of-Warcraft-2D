@@ -56,8 +56,11 @@ public abstract class IPlayer {
 	public IPlayer(RaceType race, String name) {
 		this.race = race;
 		this.name = name;
+		
+		initAnimations();
 	}
 	
+	public abstract void initAnimations();
 	public abstract void tick(WoW engine, DisplayManager display, double delta);
 	public abstract void render(WoW engine, DisplayManager display, Graphics2D graphics);
 	
@@ -139,5 +142,9 @@ public abstract class IPlayer {
 	 */
 	public String getName() {
 		return name;
+	}
+	
+	public boolean animationsInitialized() {
+		return (northAnimation != null && southAnimation != null && eastAnimation != null && westAnimation != null);
 	}
 }

@@ -38,7 +38,8 @@ public class StateGame implements IState {
 		WoWManager.Map.level.render(graphics);
 		WoWManager.Player.render(engine, display, graphics);
 		for (WorldCharacterMP player : WoWManager.Players) {
-			player.render(engine, display, graphics);
+			if (player.animationsInitialized())
+				player.render(engine, display, graphics);
 		}
 	}
 

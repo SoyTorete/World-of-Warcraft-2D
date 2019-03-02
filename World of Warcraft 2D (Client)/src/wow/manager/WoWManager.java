@@ -34,38 +34,9 @@ public class WoWManager {
 		private int id;
 		private Spritesheet spritesheet;
 		
-		private Animation northAnimation;
-		private Animation eastAnimation;
-		private Animation southAnimation;
-		private Animation westAnimation;
-		
 		RaceType(int id, Spritesheet spritesheet) {
 			this.id = id;
 			this.spritesheet = spritesheet;
-			
-			northAnimation = new Animation();
-			northAnimation.addFrame(spritesheet.getSubImage(1, 3, 32, 32), 12);
-			northAnimation.addFrame(spritesheet.getSubImage(2, 3, 32, 32), 12);
-			northAnimation.addFrame(spritesheet.getSubImage(1, 3, 32, 32), 12);
-			northAnimation.addFrame(spritesheet.getSubImage(0, 3, 32, 32), 12);
-			
-			eastAnimation = new Animation();
-			eastAnimation.addFrame(spritesheet.getSubImage(1, 2, 32, 32), 12);
-			eastAnimation.addFrame(spritesheet.getSubImage(2, 2, 32, 32), 12);
-			eastAnimation.addFrame(spritesheet.getSubImage(1, 2, 32, 32), 12);
-			eastAnimation.addFrame(spritesheet.getSubImage(0, 2, 32, 32), 12);
-
-			southAnimation = new Animation();
-			southAnimation.addFrame(spritesheet.getSubImage(1, 0, 32, 32), 12);
-			southAnimation.addFrame(spritesheet.getSubImage(2, 0, 32, 32), 12);
-			southAnimation.addFrame(spritesheet.getSubImage(1, 0, 32, 32), 12);
-			southAnimation.addFrame(spritesheet.getSubImage(0, 0, 32, 32), 12);
-
-			westAnimation = new Animation();
-			westAnimation.addFrame(spritesheet.getSubImage(1, 1, 32, 32), 12);
-			westAnimation.addFrame(spritesheet.getSubImage(2, 1, 32, 32), 12);
-			westAnimation.addFrame(spritesheet.getSubImage(1, 1, 32, 32), 12);
-			westAnimation.addFrame(spritesheet.getSubImage(0, 1, 32, 32), 12);
 		}
 		
 		public int getId() {
@@ -74,22 +45,6 @@ public class WoWManager {
 		
 		public Spritesheet getSpritesheet() {
 			return spritesheet;
-		}
-
-		public Animation getNorthAnimation() {
-			return northAnimation;
-		}
-
-		public Animation getEastAnimation() {
-			return eastAnimation;
-		}
-
-		public Animation getSouthAnimation() {
-			return southAnimation;
-		}
-
-		public Animation getWestAnimation() {
-			return westAnimation;
 		}
 	}
 	

@@ -37,8 +37,11 @@ public class StateLoading implements IState {
 			WoWManager.Map.start();
 		
 		if (WoWManager.Map.state == ParseState.Finished) {
-			if (NetworkManager.WORLD.STATUS == World.World) 
-				display.enterState(StateGame.ID);
+			if (NetworkManager.WORLD.STATUS == World.World) {
+				if (WoWManager.Player.animationsInitialized()) {
+					display.enterState(StateGame.ID);
+				}
+			}
 		}
 	}
 
